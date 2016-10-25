@@ -15,28 +15,24 @@ public class DungeonCreator : MonoBehaviour
 	{
 		mountTransform = gameObject.transform;
 		mountTransform.position = new Vector3(0, 0, 0);
-		
-		float rotY = 0.0f;
-		
-		for (int i=0; i<dungeonSize; i++)
+
+        GameObject firstGO = Instantiate(dungeonParts[1]) as GameObject;
+        firstGO.name = "part-0";
+        firstGO.transform.parent = transform;
+        firstGO.transform.localPosition = new Vector3(0, 0, 0);
+
+        mountTransform = firstGO.GetComponent<DungeonPart>().mountPoints[0];
+
+        for (int i=1; i<dungeonSize; i++)
 		{
 			int dungeonPartIndex = getRandomIndex();
 			
 			GameObject newGO = Instantiate(dungeonParts[dungeonPartIndex]) as GameObject;
 			newGO.name = String.Format("part-{0}", i);
 			newGO.transform.parent = transform;
-            print(newGO.transform.localPosition);
-			newGO.transform.localPosition = mountTransform.TransformPoint(newGO.GetComponent<DungeonPart>().mountPoints[0].transform.localPosition);
+            newGO.transform.localPosition = mountTransform.TransformVector(newGO.GetComponent<DungeonPart>().mountPoints[0].transform.localPosition);
 
-           //print("mountTransform: " + mountTransform.position);
-           // print("newGO.transform.localPosition: " + newGO.transform.localPosition);
-
-            newGO.transform.Rotate(new Vector3(0, rotY, 0));
-			
-			mountTransform = newGO.GetComponent<DungeonPart>().mountPoints[0];
-			
-			rotY += mountTransform.localRotation.eulerAngles.y;
-            
+            mountTransform = newGO.GetComponent<DungeonPart>().mountPoints[0];            
 		}
 		
 	}
@@ -52,8 +48,9 @@ public class DungeonCreator : MonoBehaviour
 	}
 	
 	private int getRandomIndex()
-	{       
-		return UnityEngine.Random.Range(0, dungeonParts.Length);
+	{
+        return 1; 
+		// return UnityEngine.Random.Range(0, dungeonParts.Length);
 	}
 
 }
