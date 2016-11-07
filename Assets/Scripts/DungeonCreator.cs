@@ -8,12 +8,16 @@ public class DungeonCreator : MonoBehaviour
 {
 	public GameObject[] dungeonParts;
 	public int minimumDungeonSize = 10;
-	
+    public GameObject wall;
+
     private List<MountPoint> opens = new List<MountPoint>();
     private int roomIndex = 2;
 
     public void Generate()
 	{
+        GameObject a = Instantiate(dungeonParts[1]) as GameObject;
+        a.transform.position = new Vector3(100, 100, 100);
+        a.transform.Rotate(new Vector3(0,90,0));
         opens = new List<MountPoint>();
         createFirstDungeonPart();
         int missingParts = minimumDungeonSize;
@@ -23,10 +27,11 @@ public class DungeonCreator : MonoBehaviour
             MountPoint currentMountPoint = getRandomOpen();
 
             int dungeonPartIndex = getRandomIndex();
-            
-            if (opens.Count == 1 && missingParts > 0)
+            if (opens.Count <= 1 && missingParts > 1)
             {
-                dungeonPartIndex = getRandomIndexWithFilter(new int[roomIndex]);
+                int[] filter = new int[1];
+                filter[0] = roomIndex;
+                dungeonPartIndex = getRandomIndexWithFilter(filter);
             }
             GameObject dungeonPart = Instantiate(dungeonParts[dungeonPartIndex]) as GameObject;
 			dungeonPart.name = String.Format("part-{0}", i);
@@ -52,7 +57,8 @@ public class DungeonCreator : MonoBehaviour
             MountPoint currentMountPoint = getRandomOpen();
 
             // Completo con habitaciones.
-            GameObject dungeonPart = Instantiate(dungeonParts[roomIndex]) as GameObject;
+            // GameObject dungeonPart = Instantiate(dungeonParts[roomIndex]) as GameObject;
+            GameObject dungeonPart = Instantiate(wall) as GameObject;
             dungeonPart.name = String.Format("part-{0}", i);
             dungeonPart.transform.parent = transform;
 
@@ -61,8 +67,10 @@ public class DungeonCreator : MonoBehaviour
             Transform mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             MountPoint mp = mpTransform.GetComponent<MountPoint>();
             TranslateAndRotation tr = getTranslateAndRotation(currentMountPoint.direction, mp.direction);
-            
+
+            print(dungeonPart.transform.eulerAngles);
             dungeonPart.transform.Rotate(tr.rotation);
+            print(dungeonPart.transform.eulerAngles);
             updateMountPointDirections(dungeonPart.GetComponent<DungeonPart>(), tr.rotation);
             mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             mp = mpTransform.GetComponent<MountPoint>();
@@ -109,9 +117,6 @@ public class DungeonCreator : MonoBehaviour
 
     private int getRandomIndexWithFilter(int[] indexesToFilter)
 	{
-        if (dungeonParts.Length == indexesToFilter.Length)
-            return 0;
-
         int index = UnityEngine.Random.Range(0, dungeonParts.Length);
         while (contains(indexesToFilter, index))
         {
@@ -297,18 +302,6 @@ public class DungeonCreator : MonoBehaviour
             this.translationScale = translationScale;
             this.rotation = rotation;
         }
-    }
-
-    private void printCardinalPoint(Vector3 direction)
-    {
-        if (isNorth(direction))
-            print("North");
-        if (isSouth(direction))
-            print("South");
-        if (isEast(direction))
-            print("East");
-        if (isWest(direction))
-            print("West");
     }
 
 }
