@@ -7,26 +7,31 @@ using UnityEngine;
 public class DungeonCreator : MonoBehaviour
 {
 	public GameObject[] dungeonParts;
-	public int dungeonSize = 10;
+	public int minimumDungeonSize = 10;
 	
     private List<MountPoint> opens = new List<MountPoint>();
+    private int roomIndex = 2;
 
     public void Generate()
 	{
         opens = new List<MountPoint>();
         createFirstDungeonPart();
-        int missingParts = dungeonSize;
+        int missingParts = minimumDungeonSize;
         int i = 1;
         while (missingParts > 0 )
 		{
             MountPoint currentMountPoint = getRandomOpen();
 
-			GameObject dungeonPart = Instantiate(dungeonParts[getRandomIndex()]) as GameObject;
+            int dungeonPartIndex = getRandomIndex();
+            
+            if (opens.Count == 1 && missingParts > 0)
+            {
+                dungeonPartIndex = getRandomIndexWithFilter(new int[roomIndex]);
+            }
+            GameObject dungeonPart = Instantiate(dungeonParts[dungeonPartIndex]) as GameObject;
 			dungeonPart.name = String.Format("part-{0}", i);
 			dungeonPart.transform.parent = transform;
-            missingParts--;
             int index = getRandomIndex(dungeonPart.GetComponent<DungeonPart>().mountPoints);
-            addToOpensExept(dungeonPart.GetComponent<DungeonPart>().mountPoints, index);
             Transform mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             MountPoint mp = mpTransform.GetComponent<MountPoint>();
             TranslateAndRotation tr = getTranslateAndRotation(currentMountPoint.direction, mp.direction);
@@ -36,6 +41,9 @@ public class DungeonCreator : MonoBehaviour
             mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             mp = mpTransform.GetComponent<MountPoint>();
             dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
+
+            addToOpensExept(dungeonPart.GetComponent<DungeonPart>().mountPoints, index);
+            missingParts--;
             i++;
 		}
         
@@ -43,8 +51,8 @@ public class DungeonCreator : MonoBehaviour
         {
             MountPoint currentMountPoint = getRandomOpen();
 
-            // Completo con habitaciones, por eso el indice 2.
-            GameObject dungeonPart = Instantiate(dungeonParts[2]) as GameObject;
+            // Completo con habitaciones.
+            GameObject dungeonPart = Instantiate(dungeonParts[roomIndex]) as GameObject;
             dungeonPart.name = String.Format("part-{0}", i);
             dungeonPart.transform.parent = transform;
 
@@ -94,10 +102,33 @@ public class DungeonCreator : MonoBehaviour
         }
     }
 
-	private int getRandomIndex()
+    private int getRandomIndex()
+    {
+        return UnityEngine.Random.Range(0, dungeonParts.Length);
+    }
+
+    private int getRandomIndexWithFilter(int[] indexesToFilter)
 	{
-		return UnityEngine.Random.Range(0, dungeonParts.Length);
+        if (dungeonParts.Length == indexesToFilter.Length)
+            return 0;
+
+        int index = UnityEngine.Random.Range(0, dungeonParts.Length);
+        while (contains(indexesToFilter, index))
+        {
+            index = UnityEngine.Random.Range(0, dungeonParts.Length);
+        }
+        return index;
 	}
+
+    private bool contains(int [] list, int value)
+    {
+        foreach (int elem in list)
+        {
+            if (elem == value)
+                return true;
+        }
+        return false;
+    }
 
     private int getRandomIndex(Transform[] mps)
     {
