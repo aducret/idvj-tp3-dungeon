@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour {
 
 	public float speed;
 	public float turnSpeed;
-	public int life;
+	public int health;
 
 	private GameController gameController;
 	private Rigidbody rb;
@@ -46,6 +46,25 @@ public class PlayerController : MonoBehaviour {
 		if (other.gameObject.CompareTag ("Goal"))
 		{
 			gameController.win ();
+		}
+		else if (other.gameObject.CompareTag ("Trap"))
+		{
+			Debug.Log ("asd");
+			reduceHealth ();
+
+		}
+	}
+
+	// This can be added with a timer. If not is called in almost all the frames
+	void OnTriggerStay(Collider other)
+	{
+	}
+
+	void reduceHealth()
+	{
+		health--;
+		if (health == 0) {
+			gameController.lose ();
 		}
 	}
 }

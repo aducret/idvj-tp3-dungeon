@@ -29,12 +29,17 @@ public class GameController : MonoBehaviour {
 		}
 		totalTime -= Time.deltaTime;
 		if (totalTime < 0) {
-			Debug.Log ("perdiste");
+			lose ();
 		}
 	}
 
 	public void win()
 	{
-		Debug.Log ("win");
+		Debug.Log ("you win");
+	}
+
+	public void lose()
+	{
+		Debug.Log ("you lose");
 	}
 }
