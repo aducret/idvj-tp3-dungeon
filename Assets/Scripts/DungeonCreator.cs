@@ -12,12 +12,11 @@ public class DungeonCreator : MonoBehaviour
 
     private List<MountPoint> opens = new List<MountPoint>();
     private int roomIndex = 2;
+    private List<GameObject> rooms; 
 
     public void Generate()
 	{
-        GameObject a = Instantiate(dungeonParts[1]) as GameObject;
-        a.transform.position = new Vector3(100, 100, 100);
-        a.transform.Rotate(new Vector3(0,90,0));
+        rooms = new List<GameObject>();
         opens = new List<MountPoint>();
         createFirstDungeonPart();
         int missingParts = minimumDungeonSize;
@@ -47,8 +46,29 @@ public class DungeonCreator : MonoBehaviour
             mp = mpTransform.GetComponent<MountPoint>();
             dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
 
+            if (collideWithOtherRoom(dungeonPart.GetComponent<BoxCollider>().bounds))
+            {
+                DestroyImmediate(dungeonPart);
+                dungeonPart = Instantiate(wall) as GameObject;
+                dungeonPart.name = String.Format("part-{0}", i);
+                dungeonPart.transform.parent = transform;
+                index = getRandomIndex(dungeonPart.GetComponent<DungeonPart>().mountPoints);
+                mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
+                mp = mpTransform.GetComponent<MountPoint>();
+                tr = getTranslateAndRotation(currentMountPoint.direction, mp.direction);
+
+                dungeonPart.transform.Rotate(tr.rotation);
+                updateMountPointDirections(dungeonPart.GetComponent<DungeonPart>(), tr.rotation);
+                mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
+                mp = mpTransform.GetComponent<MountPoint>();
+                dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
+            }
+            else
+            {
+                missingParts--;
+            }
             addToOpensExept(dungeonPart.GetComponent<DungeonPart>().mountPoints, index);
-            missingParts--;
+            rooms.Add(dungeonPart);
             i++;
 		}
         
@@ -56,9 +76,9 @@ public class DungeonCreator : MonoBehaviour
         {
             MountPoint currentMountPoint = getRandomOpen();
 
-            // Completo con habitaciones.
-            // GameObject dungeonPart = Instantiate(dungeonParts[roomIndex]) as GameObject;
-            GameObject dungeonPart = Instantiate(wall) as GameObject;
+            // Completo con habitaciones, si no entran pongo una pared.
+            GameObject dungeonPart = Instantiate(dungeonParts[roomIndex]) as GameObject;
+            // GameObject dungeonPart = Instantiate(wall) as GameObject;
             dungeonPart.name = String.Format("part-{0}", i);
             dungeonPart.transform.parent = transform;
 
@@ -68,13 +88,31 @@ public class DungeonCreator : MonoBehaviour
             MountPoint mp = mpTransform.GetComponent<MountPoint>();
             TranslateAndRotation tr = getTranslateAndRotation(currentMountPoint.direction, mp.direction);
 
-            print(dungeonPart.transform.eulerAngles);
             dungeonPart.transform.Rotate(tr.rotation);
-            print(dungeonPart.transform.eulerAngles);
             updateMountPointDirections(dungeonPart.GetComponent<DungeonPart>(), tr.rotation);
             mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             mp = mpTransform.GetComponent<MountPoint>();
             dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
+            Bounds bounds = dungeonPart.GetComponent<BoxCollider>().bounds;
+            if (collideWithOtherRoom(bounds))
+            {
+                DestroyImmediate(dungeonPart);
+                dungeonPart = Instantiate(wall);
+                dungeonPart.name = String.Format("part-{0}", i);
+                dungeonPart.transform.parent = transform;
+                index = getRandomIndex(dungeonPart.GetComponent<DungeonPart>().mountPoints);
+                addToOpensExept(dungeonPart.GetComponent<DungeonPart>().mountPoints, index);
+                mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
+                mp = mpTransform.GetComponent<MountPoint>();
+                tr = getTranslateAndRotation(currentMountPoint.direction, mp.direction);
+
+                dungeonPart.transform.Rotate(tr.rotation);
+                updateMountPointDirections(dungeonPart.GetComponent<DungeonPart>(), tr.rotation);
+                mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
+                mp = mpTransform.GetComponent<MountPoint>();
+                dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
+            }
+            rooms.Add(dungeonPart);
             i++;
         }
 	}
@@ -89,6 +127,16 @@ public class DungeonCreator : MonoBehaviour
 		}
 	}
 	
+    private bool collideWithOtherRoom(Bounds bounds)
+    {
+        foreach (GameObject room in rooms)
+        {
+            if (bounds.Intersects(room.GetComponent<BoxCollider>().bounds))
+                return true;
+        }
+        return false;
+    }
+
     private MountPoint getRandomOpen()
     {
         int index = UnityEngine.Random.Range(0, opens.Count - 1);
@@ -108,6 +156,7 @@ public class DungeonCreator : MonoBehaviour
         {
             opens.Add(t.GetComponent<MountPoint>());
         }
+        rooms.Add(firstGO);
     }
 
     private int getRandomIndex()
