@@ -46,7 +46,7 @@ public class DungeonCreator : MonoBehaviour
             mp = mpTransform.GetComponent<MountPoint>();
             dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
 
-            if (collideWithOtherRoom(dungeonPart.GetComponent<BoxCollider>().bounds))
+            if (collideWithOtherRoom(dungeonPart.GetComponent<DungeonPart>().limitCollider.bounds))
             {
                 DestroyImmediate(dungeonPart);
                 dungeonPart = Instantiate(wall) as GameObject;
@@ -93,7 +93,7 @@ public class DungeonCreator : MonoBehaviour
             mpTransform = dungeonPart.GetComponent<DungeonPart>().mountPoints[index];
             mp = mpTransform.GetComponent<MountPoint>();
             dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
-            Bounds bounds = dungeonPart.GetComponent<BoxCollider>().bounds;
+            Bounds bounds = dungeonPart.GetComponent<DungeonPart>().limitCollider.bounds;
             if (collideWithOtherRoom(bounds))
             {
                 DestroyImmediate(dungeonPart);
@@ -131,7 +131,7 @@ public class DungeonCreator : MonoBehaviour
     {
         foreach (GameObject room in rooms)
         {
-            if (bounds.Intersects(room.GetComponent<BoxCollider>().bounds))
+            if (bounds.Intersects(room.GetComponent<DungeonPart>().limitCollider.bounds))
                 return true;
         }
         return false;

@@ -2,43 +2,31 @@
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
-	public KeyCode forward;
-	public KeyCode right;
-	public KeyCode left;
 
-	public float speed;
-	public float turnSpeed;
-	public int health;
+    public GameObject game;
+    public int health = 3;
 
-	private GameController gameController;
+    private GameController gameController;
 	private Rigidbody rb;
 
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
-		gameController = GetComponent<GameController> ();
-	}
+        gameController = game.GetComponent<GameController>();
+
+    }
 	
 	// Update is called once per fram;
 	void FixedUpdate () {
 		if (!gameController.isPaused())
 		{
-			Vector3 vel = transform.forward * speed;
+            var x = Input.GetAxis("Horizontal") * Time.deltaTime * 150.0f;
+            var z = Input.GetAxis("Vertical") * Time.deltaTime * 3.0f;
 
-			if (Input.GetKey(left))
-			{
-				transform.Rotate (-Vector3.up * turnSpeed * Time.deltaTime);
-			} 
-			if (Input.GetKey(right))
-			{
-				transform.Rotate (Vector3.up * turnSpeed  * Time.deltaTime);
-			}
-			if (Input.GetKey (forward)) {
-				transform.position -= transform.forward * Time.deltaTime * speed;
-			} 
-			else {
-				rb.velocity = new Vector3 (0, 0, 0);
-			}
-		}
+            transform.Rotate(0, x, 0);
+            transform.Translate(0, 0, -z);
+
+            print(x);
+        }
 	}
 
 	void OnTriggerEnter(Collider other) 
