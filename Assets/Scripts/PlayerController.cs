@@ -9,11 +9,13 @@ public class PlayerController : MonoBehaviour {
 
     private GameController gameController;
 	private Rigidbody rb;
+    private Animator animator;
 
-	void Start () {
+    void Start () {
         rb = GetComponent<Rigidbody> ();
         gameController = game.GetComponent<GameController>();
         printHealthLabel();
+        animator = GetComponent<Animator>();
     }
 	
 	// Update is called once per fram;
@@ -25,6 +27,16 @@ public class PlayerController : MonoBehaviour {
 
             transform.Rotate(0, x, 0);
             transform.Translate(0, 0, -z);
+
+            if (x != 0 || z != 0)
+            {
+                animator.SetBool("Charge", true);
+                animator.SetBool("Idle", false);
+            } else
+            {
+                animator.SetBool("Charge", false);
+                animator.SetBool("Idle", true);
+            }
         }
 	}
 
