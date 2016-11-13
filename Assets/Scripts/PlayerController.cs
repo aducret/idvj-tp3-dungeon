@@ -1,10 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 public class PlayerController : MonoBehaviour {
-
     public GameObject game;
     public int health = 3;
+    public Text healthLabel;
 
     private GameController gameController;
 	private Rigidbody rb;
@@ -12,7 +13,7 @@ public class PlayerController : MonoBehaviour {
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
         gameController = game.GetComponent<GameController>();
-
+        printHealthLabel();
     }
 	
 	// Update is called once per fram;
@@ -24,8 +25,6 @@ public class PlayerController : MonoBehaviour {
 
             transform.Rotate(0, x, 0);
             transform.Translate(0, 0, -z);
-
-            print(x);
         }
 	}
 
@@ -37,7 +36,6 @@ public class PlayerController : MonoBehaviour {
 		}
 		else if (other.gameObject.CompareTag ("Trap"))
 		{
-			Debug.Log ("asd");
 			reduceHealth ();
 
 		}
@@ -51,8 +49,14 @@ public class PlayerController : MonoBehaviour {
 	void reduceHealth()
 	{
 		health--;
-		if (health == 0) {
+        printHealthLabel();
+        if (health == 0) {
 			gameController.lose ();
 		}
 	}
+
+    private void printHealthLabel()
+    {
+        healthLabel.text = string.Format("Health: {0}", health);
+    }
 }

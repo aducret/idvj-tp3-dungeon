@@ -1,33 +1,33 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameController : MonoBehaviour {
 	public KeyCode pause;
 	public float totalTime;
-		
-	private bool paused = false;
-	private bool endGame = false;
+    public Text timerLabel;
+    public GameObject deadPanel;
+    public GameObject goalPanel;
+    public GameObject pausePanel;
 
-	void Start () {
-	
-	}
+    private bool paused = false;
+	private bool gameOver = false;
 
 	public bool isPaused() {
 		return paused;
 	}
 	
-	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (pause)) {
 			if (paused) {
-				Time.timeScale = 1;
-				paused = false;
+                unPauseGame();
 			} else {
-				Time.timeScale = 0;
-				paused = true;
-			}
+                pauseGame(true);
+            }
 		}
-		totalTime -= Time.deltaTime;
+		
+        timeManager();
 		if (totalTime < 0) {
 			lose ();
 		}
@@ -35,11 +35,43 @@ public class GameController : MonoBehaviour {
 
 	public void win()
 	{
-		Debug.Log ("you win");
+        gameOver = true;
+        pauseGame(false);
+        goalPanel.SetActive(true);
 	}
 
 	public void lose()
 	{
-		Debug.Log ("you lose");
-	}
+        gameOver = true;
+        pauseGame(false);
+        deadPanel.SetActive(true);
+    }
+
+    public void goToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    private void pauseGame(bool panel)
+    {
+        Time.timeScale = 0;
+        paused = true;
+        pausePanel.SetActive(panel);
+    }
+
+    private void unPauseGame()
+    {
+        Time.timeScale = 1;
+        paused = false;
+        pausePanel.SetActive(false);
+    }
+
+    private void timeManager()
+    {
+        totalTime -= Time.deltaTime;
+        var minutes = totalTime / 60;
+        var seconds = totalTime % 60;
+
+        timerLabel.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+    }
 }
