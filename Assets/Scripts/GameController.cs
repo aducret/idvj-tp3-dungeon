@@ -18,6 +18,11 @@ public class GameController : MonoBehaviour {
 		return paused;
 	}
 	
+    void Start()
+    {
+        unPauseGame();
+    }
+
 	void Update () {
 		if (Input.GetKeyDown (pause)) {
 			if (paused) {

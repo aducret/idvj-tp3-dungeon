@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 	private Rigidbody rb;
 
 	void Start () {
-		rb = GetComponent<Rigidbody> ();
+        rb = GetComponent<Rigidbody> ();
         gameController = game.GetComponent<GameController>();
         printHealthLabel();
     }
