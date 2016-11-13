@@ -49,7 +49,7 @@ public class GameController : MonoBehaviour {
 
     public void goToMainMenu()
     {
-        SceneManager.LoadScene("MainMenu");
+        SceneManager.LoadScene("Main Menu");
     }
 
     private void pauseGame(bool panel)
