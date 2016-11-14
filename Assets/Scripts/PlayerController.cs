@@ -15,7 +15,9 @@ public class PlayerController : MonoBehaviour {
 
     void Start () {
         rb = GetComponent<Rigidbody> ();
-        gameController = game.GetComponent<GameController>();
+        // gameController = game.GetComponent<GameController>();
+        gameController = GameObject.FindGameObjectWithTag("Game").GetComponent<GameController>();
+        healthLabel = GameObject.FindGameObjectWithTag("HealthLabel").GetComponent<Text>();
         printHealthLabel();
         animator = GetComponent<Animator>();
     }

@@ -13,17 +13,20 @@ public class DungeonCreator : MonoBehaviour
 
     public GameObject goalPrefab;
     public GameObject[] trapPrefabs;
+    public GameObject playerPrefab;
 
     private List<MountPoint> opens = new List<MountPoint>();
     private int roomIndex = 2;
     private List<GameObject> rooms;
     private List<GameObject> trapPlaces;
     private List<GameObject> goalPlaces;
+    private List<GameObject> startPlaces;
 
     public void Generate()
 	{
         trapPlaces = new List<GameObject>();
         goalPlaces = new List<GameObject>();
+        startPlaces = new List<GameObject>();
 
         rooms = new List<GameObject>();
         opens = new List<MountPoint>();
@@ -128,14 +131,21 @@ public class DungeonCreator : MonoBehaviour
         }
         setGoal();
         setTraps();
+        setPlayer();
 	}
+
+    private void setPlayer()
+    {
+        int index = UnityEngine.Random.Range(0, startPlaces.Count - 1);
+        GameObject startPlace = startPlaces[index];
+        (Instantiate(playerPrefab, startPlace.transform.position + new Vector3(0, 0.25f, 0), playerPrefab.transform.rotation) as GameObject).transform.parent = startPlace.transform;
+    }
 
     private void setGoal()
     {
         int index = UnityEngine.Random.Range(0, goalPlaces.Count - 1);
         GameObject goalPlace = goalPlaces[index];
         (Instantiate(goalPrefab, goalPlace.transform.position + new Vector3(0, 0.25f, 0), goalPrefab.transform.rotation) as GameObject).transform.parent = goalPlace.transform;
-        // Instantiate(goalPrefab, goalPlace.transform.position, goalPrefab.transform.rotation);
     }
 
     private void setTraps()
@@ -144,11 +154,9 @@ public class DungeonCreator : MonoBehaviour
         for (int i = 0; i < trapsAmount; i++)
         {
             int index = UnityEngine.Random.Range(0, trapPlaces.Count - 1);
-            Debug.Log(index);
             GameObject trapPlace = trapPlaces[index];
 
             int trap = UnityEngine.Random.Range(0, trapPrefabs.Length);
-            Debug.Log(trap);
             GameObject trapPrefab = trapPrefabs[trap];
 
             (Instantiate(trapPrefab, trapPlace.transform.position + new Vector3(0, 0.25f, 0), trapPrefab.transform.rotation) as GameObject).transform.parent = trapPlace.transform;
@@ -405,6 +413,10 @@ public class DungeonCreator : MonoBehaviour
             else if (child.CompareTag("GoalPlace"))
             {
                 goalPlaces.Add(child.gameObject);
+            }
+            else if (child.CompareTag("StartPlace"))
+            {
+                startPlaces.Add(child.gameObject);
             }
         }
     }
