@@ -12,7 +12,6 @@ public class GameController : MonoBehaviour {
     public GameObject pausePanel;
 
     private bool paused = false;
-	private bool gameOver = false;
 
 	public bool isPaused() {
 		return paused;
@@ -40,14 +39,12 @@ public class GameController : MonoBehaviour {
 
 	public void win()
 	{
-        gameOver = true;
         pauseGame(false);
         goalPanel.SetActive(true);
 	}
 
 	public void lose()
 	{
-        gameOver = true;
         pauseGame(false);
         deadPanel.SetActive(true);
     }
