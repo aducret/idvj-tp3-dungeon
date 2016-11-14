@@ -9,13 +9,22 @@ public class DungeonCreator : MonoBehaviour
 	public GameObject[] dungeonParts;
 	public int minimumDungeonSize = 10;
     public GameObject wall;
+    public float difficulty;
+
+    public GameObject goalPrefab;
+    public GameObject[] trapPrefabs;
 
     private List<MountPoint> opens = new List<MountPoint>();
     private int roomIndex = 2;
-    private List<GameObject> rooms; 
+    private List<GameObject> rooms;
+    private List<GameObject> trapPlaces;
+    private List<GameObject> goalPlaces;
 
     public void Generate()
 	{
+        trapPlaces = new List<GameObject>();
+        goalPlaces = new List<GameObject>();
+
         rooms = new List<GameObject>();
         opens = new List<MountPoint>();
         createFirstDungeonPart();
@@ -69,6 +78,7 @@ public class DungeonCreator : MonoBehaviour
             }
             addToOpensExept(dungeonPart.GetComponent<DungeonPart>().mountPoints, index);
             rooms.Add(dungeonPart);
+            collectTrapsAndGoals(dungeonPart);
             i++;
 		}
         
@@ -113,11 +123,41 @@ public class DungeonCreator : MonoBehaviour
                 dungeonPart.transform.position = currentMountPoint.transform.position + new Vector3(tr.translationScale.x * Math.Abs(mp.translation.x), tr.translationScale.y * mp.translation.y, tr.translationScale.z * Math.Abs(mp.translation.z));
             }
             rooms.Add(dungeonPart);
+            collectTrapsAndGoals(dungeonPart);
             i++;
         }
+        setGoal();
+        setTraps();
 	}
-	
-	public void RemoveAll()
+
+    private void setGoal()
+    {
+        int index = UnityEngine.Random.Range(0, goalPlaces.Count - 1);
+        GameObject goalPlace = goalPlaces[index];
+        (Instantiate(goalPrefab, goalPlace.transform.position + new Vector3(0, 0.25f, 0), goalPrefab.transform.rotation) as GameObject).transform.parent = goalPlace.transform;
+        // Instantiate(goalPrefab, goalPlace.transform.position, goalPrefab.transform.rotation);
+    }
+
+    private void setTraps()
+    {
+        int trapsAmount = (int) Math.Floor(difficulty * trapPlaces.Count);
+        for (int i = 0; i < trapsAmount; i++)
+        {
+            int index = UnityEngine.Random.Range(0, trapPlaces.Count - 1);
+            Debug.Log(index);
+            GameObject trapPlace = trapPlaces[index];
+
+            int trap = UnityEngine.Random.Range(0, trapPrefabs.Length);
+            Debug.Log(trap);
+            GameObject trapPrefab = trapPrefabs[trap];
+
+            (Instantiate(trapPrefab, trapPlace.transform.position + new Vector3(0, 0.25f, 0), trapPrefab.transform.rotation) as GameObject).transform.parent = trapPlace.transform;
+
+            trapPlaces.RemoveAt(index);
+        }
+    }
+
+    public void RemoveAll()
 	{
 		DungeonPart[] rc = gameObject.GetComponentsInChildren<DungeonPart>();
 		
@@ -157,6 +197,7 @@ public class DungeonCreator : MonoBehaviour
             opens.Add(t.GetComponent<MountPoint>());
         }
         rooms.Add(firstGO);
+        collectTrapsAndGoals(firstGO);
     }
 
     private int getRandomIndex()
@@ -350,6 +391,21 @@ public class DungeonCreator : MonoBehaviour
         {
             this.translationScale = translationScale;
             this.rotation = rotation;
+        }
+    }
+
+    private void collectTrapsAndGoals(GameObject go)
+    {
+        foreach (Transform child in go.transform)
+        {
+            if (child.CompareTag("TrapPlace"))
+            {
+                trapPlaces.Add(child.gameObject);
+            }
+            else if (child.CompareTag("GoalPlace"))
+            {
+                goalPlaces.Add(child.gameObject);
+            }
         }
     }
 
