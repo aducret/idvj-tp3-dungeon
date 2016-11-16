@@ -7,9 +7,9 @@ using UnityEngine;
 public class DungeonCreator : MonoBehaviour
 {
 	public GameObject[] dungeonParts;
-	public int minimumDungeonSize = 10;
+	private int minimumDungeonSize;
     public GameObject wall;
-    public float difficulty;
+    private float difficulty;
 
     public GameObject goalPrefab;
     public GameObject[] trapPrefabs;
@@ -24,6 +24,9 @@ public class DungeonCreator : MonoBehaviour
 
     public void Generate()
 	{
+        difficulty = Application.difficulty;
+        minimumDungeonSize = Application.size * 10;
+
         trapPlaces = new List<GameObject>();
         goalPlaces = new List<GameObject>();
         startPlaces = new List<GameObject>();

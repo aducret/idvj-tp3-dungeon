@@ -4,7 +4,6 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour {
     public GameObject game;
-    public int health = 3;
     public Text healthLabel;
 
     private GameController gameController;
@@ -12,17 +11,17 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private bool jumping = false;
     private float jumpTimer = 0;
+    private int health = 10;
 
     void Start () {
         rb = GetComponent<Rigidbody> ();
-        // gameController = game.GetComponent<GameController>();
         gameController = GameObject.FindGameObjectWithTag("Game").GetComponent<GameController>();
         healthLabel = GameObject.FindGameObjectWithTag("HealthLabel").GetComponent<Text>();
         printHealthLabel();
         animator = GetComponent<Animator>();
     }
 	
-	// Update is called once per fram;
+	// Update is called once per frame;
 	void FixedUpdate () {
         
 		if (!gameController.isPaused())
@@ -76,11 +75,6 @@ public class PlayerController : MonoBehaviour {
 			reduceHealth ();
 
 		}
-	}
-
-	// This can be added with a timer. If not is called in almost all the frames
-	void OnTriggerStay(Collider other)
-	{
 	}
 
     void reduceHealth()

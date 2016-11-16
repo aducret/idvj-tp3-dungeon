@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour {
     public GameObject deadPanel;
     public GameObject goalPanel;
     public GameObject pausePanel;
+    public DungeonCreator dc;
 
     private bool paused = false;
 
@@ -19,6 +20,9 @@ public class GameController : MonoBehaviour {
 	
     void Start()
     {
+        dc.RemoveAll();
+        dc.Generate();
+        totalTime = Application.size * 100f;
         unPauseGame();
     }
 
@@ -51,6 +55,9 @@ public class GameController : MonoBehaviour {
 
     public void goToMainMenu()
     {
+        goalPanel.SetActive(false);
+        deadPanel.SetActive(false);
+        pausePanel.SetActive(false);
         SceneManager.LoadScene("Main Menu");
     }
 
@@ -71,7 +78,7 @@ public class GameController : MonoBehaviour {
     private void timeManager()
     {
         totalTime -= Time.deltaTime;
-        var minutes = totalTime / 60;
+        var minutes = (int) Mathf.Floor(totalTime / 60);
         var seconds = totalTime % 60;
 
         timerLabel.text = string.Format("{0:00}:{1:00}", minutes, seconds);
